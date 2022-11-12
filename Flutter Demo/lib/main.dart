@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:flutter_share/flutter_share.dart';
+import 'package:url_launcher/url_launcher.dart';
+String explantationText = 'Lake Oeschinen lies at the foot of the Blüemlisalp in the Bernese '
+    'Alps. Situated 1,578 meters above sea level, it is one of the '
+    'larger Alpine Lakes. A gondola ride from Kandersteg, followed by a '
+    'half-hour walk through pastures and pine forest, leads you to the '
+    'lake, which warms to 20 degrees Celsius in the summer. Activities '
+    'enjoyed here include rowing, and riding the summer toboggan run.';
 
 void main() {
   runApp(const MyApp());
@@ -84,9 +93,9 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget buttonSection = Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildButtonColumn(color, Icons.call, 'CALL'),
-        _buildButtonColumn(color, Icons.near_me, 'ROUTE'),
-        _buildButtonColumn(color, Icons.share, 'SHARE'),
+        _buildButtonColumn(color, Icons.call, 'CALL', funcCall),
+        _buildButtonColumn(color, Icons.near_me, 'ROUTE', funcRoute),
+        _buildButtonColumn(color, Icons.share, 'SHARE', funcShare),
       ],
     );
     Widget textSection = const Padding(
@@ -117,15 +126,23 @@ class _MyHomePageState extends State<MyHomePage> {
           buttonSection,
           textSection,
         ],
+
+
       ),
+
     );
   }
-  Column _buildButtonColumn(Color color, IconData icon, String label) {
+  Column _buildButtonColumn(Color color, IconData icon, String label, Function func) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: color),
+        IconButton(
+          icon:Icon(icon),
+          color: color,
+          onPressed: ()
+          { func();},
+        ),
         Container(
           margin: const EdgeInsets.only(top: 8),
           child: Text(
@@ -141,4 +158,21 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+}
+void funcCall() {
+  FlutterPhoneDirectCaller.callNumber("8881230990");
+}
+void funcRoute()  async {
+  const url = 'https://www.google.com/maps/place/Oeschinen+Lake';
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+Future<void> funcShare() async {
+  await FlutterShare.share(
+      title: 'Oeschinen Lake Campground',
+      text: explantationText,
+      linkUrl: 'https://www.google.com/maps/place/Oeschinen+Lake');
 }
